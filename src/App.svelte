@@ -60,9 +60,9 @@
 		// numLettersTyped = Math.min(currentInput.length, startText.length)
 	}
 	const sizes = {
-		small:100,
-		medium:200,
-		large:400,
+		small:75,
+		medium:125,
+		large:300,
 	}
 	let size = sizes[new URLSearchParams(window.location.search).get('size')]
 	if(size) oraclePopulate(size)
@@ -79,7 +79,7 @@
 		<p class="testStats">
 			{Math.round(numWordsTyped/(millisecondsSpent/60000))||"--"} wpm {Math.round((numCorrectLetters/numLettersTyped)*100)||"--"}% acc
 		</p>
-		<p class="testStart">
+		<p class="testPrompt">
 			{#each letters as letter}
 				<span class={letter.status}>{letter.letter}</span>
 			{/each}
@@ -105,15 +105,32 @@
 	.testArea {
 		font-family: monospace;
 		font-size: 32px;
+		user-select: none;
 	}
+	.testInput{
+		user-select: unset;
+		cursor: text;
+	}
+	// .testPrompt{
+	// 	span{
+	// 		// display: inline-block;
+	// 		// transition: 120ms cubic-bezier(0.175, 0.885, 0.32, 1);
+	// 		// background-image: linear-gradient(0deg, salmon 0%, salmon 32%, white 33%, white 67%, lightgreen 68%, lightgreen 100%);
+	// 		// background-size: 100% 300%;
+	// 		// background-position-y: 50%;
+	// 	}
+	// }
 	span.untyped{
 		color: gray;
 	}
 	span.correct{
 		background-color: lightgreen;
+		// background-position-y: 0%;
 	}
 	span.incorrect{
 		background-color: salmon;
+		// background-position-y: 100%;
+
 	}
 	.testInput:focus{
 		outline: none;
@@ -132,11 +149,11 @@
 			font-size: 48px;
 		}
 	}
-	main.gamestate_pre{
-		// .testStats{
-		// 	height: 0px;
-		// 	margin: 0;
-		// 	// opacity: 0;
-		// }
-	}
+	// main.gamestate_pre{
+	// 	// .testStats{
+	// 	// 	height: 0px;
+	// 	// 	margin: 0;
+	// 	// 	// opacity: 0;
+	// 	// }
+	// }
 </style>

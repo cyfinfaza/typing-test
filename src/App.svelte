@@ -1,4 +1,7 @@
 <script>
+	import {resultHistory} from './stores'
+	import AreYouSureButton from './AreYouSureButton.svelte'
+import { element } from 'svelte/internal';
 	let currentInput = ""
 	let startText = "--"
 	// const startText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ullamcorper neque eu ullamcorper sodales. Etiam sodales elit vel lectus laoreet pellentesque. Phasellus massa augue, accumsan sit amet nisl nec, aliquam efficitur sem. Morbi tempor, dolor vel pellentesque iaculis, sapien felis bibendum ipsum, et condimentum nulla odio a dui. Nam quis neque euismod, varius sem at, auctor sapien. Donec ullamcorper est ornare posuere cursus. Donec mollis blandit tincidunt. Etiam id felis a est mollis vulputate. Donec sagittis turpis id sem condimentum condimentum. Vestibulum varius lacinia justo at gravida."
@@ -10,7 +13,6 @@
 	let numWordsTyped = 0;
 	let millisecondsSpent = 0;
 	let startTime = 0;
-	let timeInterval;
 	async function oraclePopulate(size=100){
 		startText = ""
 		while (startText.length<size){
@@ -31,7 +33,6 @@
 	$: {
 		numWordsTyped = currentInput.indexOf(" ")==-1?0:currentInput.split(" ").length
 		numLettersTyped = Math.min(currentInput.length, startText.length)
-		numCorrectLetters = 0;
 		if(currentInput.length===1 && millisecondsSpent===0){
 			startTime = parseInt(Date.now().toPrecision())
 			gameStatus = 'running'
@@ -39,13 +40,10 @@
 		if(gameStatus=='running'){
 			millisecondsSpent = parseInt(Date.now().toPrecision())-startTime
 		}
-		if(numLettersTyped>=startText.length && gameStatus=='running'){
-			console.log('switched game status')
-			gameStatus='post'
-		}
 		if (currentInput == '\x0a' && currentInput.length===1){
 			currentInput = "";
 		}
+		numCorrectLetters = 0;
 		letters = startText.split("").map((originalChar, i)=>{
 			let letter = originalChar
 			let status = 'untyped'
@@ -61,11 +59,26 @@
 			}
 			return {letter, status}
 		})
+		if(numLettersTyped>=startText.length && gameStatus=='running'){
+			// console.log('switched game status')
+			gameStatus='post'
+			// const currentHistory = $resultHistory?$resultHistory:[]
+			// console.log(currentHistory)
+			// console.log(numCorrectLetters, numLettersTyped)
+			resultHistory.set([{
+				'wpm':Math.round(numWordsTyped/(millisecondsSpent/60000)), 
+				'cpm':Math.round(numLettersTyped/(millisecondsSpent/60000)),
+				'acc':Math.round((numCorrectLetters/numLettersTyped)*100)},
+				...$resultHistory])
+		}
 		// numLettersTyped = Math.min(currentInput.length, startText.length)
 	}
+	$: {
+		console.log(gameStatus)
+	}
 	const sizes = {
-		small:75,
-		medium:125,
+		small:50,
+		medium:150,
 		large:300,
 	}
 	let size = sizes[new URLSearchParams(window.location.search).get('size')]
@@ -76,12 +89,43 @@
 		// oraclePopulate(sizes[size])
 		window.location.search=`size=${size}`
 	}
+	function resetGame(){
+		gameStatus = 'loading'
+		currentInput = "";
+		startText = "--";
+		numLettersTyped = 0;
+		numCorrectLetters = 0;
+		numWordsTyped = 0;
+		millisecondsSpent = 0;
+		startTime = 0;
+		if(size) oraclePopulate(size)
+		else oraclePopulate()
+	}
+	document.onkeydown = e=>{
+		// console.log(e)
+		if(e.key=='Tab'){
+			resetGame()
+		} 
+	}
+	let graphMax = 0;
+	$: {
+		let newMax = 0;
+		$resultHistory.forEach(elem=>{
+			let val = elem.cpm*elem.acc
+			if(val>newMax){
+				newMax = val;
+			}
+		})
+		graphMax = newMax/100;
+	}
 </script>
 
 <main class="gamestate_{gameStatus}">
 	<div class="testArea">
 		<p class="testStats">
-			{Math.round(numWordsTyped/(millisecondsSpent/60000))||"--"} wpm {Math.round((numCorrectLetters/numLettersTyped)*100)||"--"}% acc
+			{Math.round(numWordsTyped/(millisecondsSpent/60000))||"--"} wpm 
+			{Math.round(numLettersTyped/(millisecondsSpent/60000))||"--"} cpm 
+			{Math.round((numCorrectLetters/numLettersTyped)*100)||"--"}% acc
 		</p>
 		<p class="testPrompt">
 			{#each letters as letter}
@@ -93,19 +137,41 @@
 		{:else} 
 			{#if gameStatus=='post'}
 				<p class="testInput">{currentInput}</p>
+				<p style="color: green;">press tab to regenerate</p>
 			{:else}
 				<p class="testInput" contenteditable bind:textContent={currentInput} autofocus></p>
 			{/if}
 			<!-- <p class="testInput" contenteditable={gameStatus!='post'} on:input={(e)=>currentInput=e.target.innerText} autofocus></p> -->
 		{/if}
 	</div>
+	<h2>test size</h2>
 	<button on:click={_=>regenerate('small')}>small</button>
 	<button on:click={_=>regenerate('medium')}>medium</button>
 	<button on:click={_=>regenerate('large')}>large</button>
 	<p style="font-size: small;">powered by <a href="https://oracle.cy2.me">oracle.cy2.me</a></p>
+	<h2>past attempts </h2> <AreYouSureButton onclick={_=>resultHistory.set([])}>clear past attempts</AreYouSureButton>
+	<ul>
+		{#each $resultHistory as result}
+			<li class="attemptListItem">
+				{result.wpm} wpm 
+				{result.cpm} cpm 
+				{result.acc}% acc
+				<div class="graphBar" style="width: {(result.cpm*result.acc)/graphMax}%;"></div>
+			</li>
+		{/each}
+	</ul>
 </main>
 
 <style lang="scss">
+	.graphBar{
+		// position: absolute;
+		height: 0.8ch;
+		// border-radius: 2px;
+		background-color: gray;
+	}
+	.attemptListItem{
+		max-width: 500px;
+	}
 	.testArea {
 		font-family: monospace;
 		font-size: 32px;

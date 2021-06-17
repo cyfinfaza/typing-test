@@ -22,6 +22,10 @@
 			if(startText.length>0) startText+=" ";
 			startText+=data
 		}
+		while(startText.indexOf('  ')>-1){
+			console.log('removing spaces')
+			startText = startText.replaceAll('  ', ' ')
+		}
 		gameStatus='pre'
 	}
 	$: {

@@ -81,9 +81,9 @@ import { element } from 'svelte/internal';
 		medium:150,
 		large:300,
 	}
-	let size = sizes[new URLSearchParams(window.location.search).get('size')]
-	if(size) oraclePopulate(size)
-	else oraclePopulate()
+	let sizeString = new URLSearchParams(window.location.search).get('size')
+	if(!sizes[sizeString]) sizeString="small"
+	oraclePopulate(sizes[sizeString])
 	function regenerate(size){
 		// gameStatus='loading'
 		// oraclePopulate(sizes[size])
@@ -156,9 +156,9 @@ import { element } from 'svelte/internal';
 		{/if}
 	</div>
 	<h2>test size</h2>
-	<button on:click={_=>regenerate('small')}>small</button>
-	<button on:click={_=>regenerate('medium')}>medium</button>
-	<button on:click={_=>regenerate('large')}>large</button>
+	<button style={sizeString=="small"?"background-color: lightskyblue;":null} on:click={_=>regenerate('small')}>small</button>
+	<button style={sizeString=="medium"?"background-color: lightskyblue;":null} on:click={_=>regenerate('medium')}>medium</button>
+	<button style={sizeString=="large"?"background-color: lightskyblue;":null} on:click={_=>regenerate('large')}>large</button>
 	<p style="font-size: small;">powered by <a href="https://oracle.cy2.me">oracle.cy2.me</a></p>
 	<h2>past attempts </h2> 
 	<AreYouSureButton onclick={_=>resultHistory.set([])}>clear past attempts</AreYouSureButton>

@@ -167,7 +167,7 @@
 		{:else} 
 			{#if gameStatus=='post'}
 				<p class="testInput">{currentInput}</p>
-				<p style="color: green;">press tab to regenerate</p>
+				<p style="color: green;">press tab to continue</p>
 			{:else}
 				<p class="testInput" contenteditable bind:textContent={currentInput} autofocus></p>
 			{/if}

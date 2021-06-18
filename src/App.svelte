@@ -176,8 +176,8 @@ import { element } from 'svelte/internal';
 		{/if}
 	</div>
 	<p class="keyInstructions">
-		<code>tab</code> to regenerate
-		<code>esc</code> to retry
+		<code>tab</code> for next sample
+		<code>esc</code> to retry current sample
 	</p>
 	<h2>test size</h2>
 	<button style={sizeString=="small"?"background-color: lightskyblue;":null} on:click={_=>regenerate('small')}>small</button>

@@ -1,7 +1,6 @@
 <script>
-	import {resultHistory} from './stores'
+	import {resultHistory, testFont} from './stores'
 	import AreYouSureButton from './AreYouSureButton.svelte'
-import { element } from 'svelte/internal';
 	let currentInput = ""
 	let startText = "--"
 	// const startText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ullamcorper neque eu ullamcorper sodales. Etiam sodales elit vel lectus laoreet pellentesque. Phasellus massa augue, accumsan sit amet nisl nec, aliquam efficitur sem. Morbi tempor, dolor vel pellentesque iaculis, sapien felis bibendum ipsum, et condimentum nulla odio a dui. Nam quis neque euismod, varius sem at, auctor sapien. Donec ullamcorper est ornare posuere cursus. Donec mollis blandit tincidunt. Etiam id felis a est mollis vulputate. Donec sagittis turpis id sem condimentum condimentum. Vestibulum varius lacinia justo at gravida."
@@ -152,7 +151,7 @@ import { element } from 'svelte/internal';
 </script>
 
 <main class="gamestate_{gameStatus}">
-	<div class="testArea">
+	<div class="testArea" style={$testFont?`font-family: ${$testFont}, monospace`:null}>
 		<p class="testStats">
 			{Math.round(numWordsTyped/(millisecondsSpent/60000))||"--"} wpm 
 			{Math.round(numLettersTyped/(millisecondsSpent/60000))||"--"} cpm 
@@ -179,11 +178,19 @@ import { element } from 'svelte/internal';
 		<code>tab</code> for next sample
 		<code>esc</code> to retry current sample
 	</p>
-	<h2>test size</h2>
-	<button style={sizeString=="small"?"background-color: lightskyblue;":null} on:click={_=>regenerate('small')}>small</button>
-	<button style={sizeString=="medium"?"background-color: lightskyblue;":null} on:click={_=>regenerate('medium')}>medium</button>
-	<button style={sizeString=="large"?"background-color: lightskyblue;":null} on:click={_=>regenerate('large')}>large</button>
-	<p style="font-size: small;">powered by <a href="https://oracle.cy2.me">oracle.cy2.me</a></p>
+	<div class="optionsContainer">
+		<h2>test size</h2>
+		<button style={sizeString=="small"?"background-color: lightskyblue;":null} on:click={_=>regenerate('small')}>small</button>
+		<button style={sizeString=="medium"?"background-color: lightskyblue;":null} on:click={_=>regenerate('medium')}>medium</button>
+		<button style={sizeString=="large"?"background-color: lightskyblue;":null} on:click={_=>regenerate('large')}>large</button>
+		<p style="font-size: small;">powered by <a href="https://oracle.cy2.me">oracle.cy2.me</a></p>
+	</div>
+	<div class="optionsContainer">
+		<h2>options</h2>
+		<p>
+			test font: <input type="text" bind:value={$testFont} placeholder="font family name">
+		</p>
+	</div>
 	<h2>past attempts </h2> 
 	<AreYouSureButton onclick={_=>resultHistory.set([])}>clear past attempts</AreYouSureButton>
 	<button on:click={downloadPastAttempts}>download json</button>
@@ -202,6 +209,11 @@ import { element } from 'svelte/internal';
 </main>
 
 <style lang="scss">
+	.optionsContainer{
+		display: inline-block; 
+		margin-right: 16px;
+		vertical-align: top;
+	}
 	.keyInstructions{
 		code{
 			background-color: #ddd;

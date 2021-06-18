@@ -98,8 +98,7 @@ import { element } from 'svelte/internal';
 		numWordsTyped = 0;
 		millisecondsSpent = 0;
 		startTime = 0;
-		if(size) oraclePopulate(size)
-		else oraclePopulate()
+		oraclePopulate(sizes[sizeString])
 	}
 	document.onkeydown = e=>{
 		// console.log(e)

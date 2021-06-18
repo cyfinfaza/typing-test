@@ -118,6 +118,17 @@ import { element } from 'svelte/internal';
 		})
 		graphMax = newMax/100;
 	}
+	let downloaderElem = null;
+	function downloadPastAttempts(){
+		const blob = new Blob([JSON.stringify($resultHistory)], {type:'application/json'})
+		const objectURL = URL.createObjectURL(blob)
+		console.log(objectURL)
+		downloaderElem.setAttribute("href", objectURL);
+		downloaderElem.setAttribute("download", "typing test log.json");
+		downloaderElem.click();
+		// window.open(objectURL)
+		// debugger
+	}
 </script>
 
 <main class="gamestate_{gameStatus}">
@@ -149,7 +160,10 @@ import { element } from 'svelte/internal';
 	<button on:click={_=>regenerate('medium')}>medium</button>
 	<button on:click={_=>regenerate('large')}>large</button>
 	<p style="font-size: small;">powered by <a href="https://oracle.cy2.me">oracle.cy2.me</a></p>
-	<h2>past attempts </h2> <AreYouSureButton onclick={_=>resultHistory.set([])}>clear past attempts</AreYouSureButton>
+	<h2>past attempts </h2> 
+	<AreYouSureButton onclick={_=>resultHistory.set([])}>clear past attempts</AreYouSureButton>
+	<button on:click={downloadPastAttempts}>download json</button>
+	<a bind:this={downloaderElem} style="display: none;"></a>
 	<ul>
 		{#each $resultHistory as result}
 			<li class="attemptListItem">

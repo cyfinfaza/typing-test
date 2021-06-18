@@ -66,10 +66,15 @@ import { element } from 'svelte/internal';
 			// console.log(currentHistory)
 			// console.log(numCorrectLetters, numLettersTyped)
 			resultHistory.set([{
-				'wpm':Math.round(numWordsTyped/(millisecondsSpent/60000)), 
-				'cpm':Math.round(numLettersTyped/(millisecondsSpent/60000)),
-				'acc':Math.round((numCorrectLetters/numLettersTyped)*100)},
-				...$resultHistory])
+				wpm: Math.round(numWordsTyped/(millisecondsSpent/60000)), 
+				cpm: Math.round(numLettersTyped/(millisecondsSpent/60000)),
+				acc: Math.round((numCorrectLetters/numLettersTyped)*100),
+				// letters: letters.map(elem=>({'l':elem.letter, 's':elem.status})),
+				original:startText,
+				userInput:currentInput,
+				timestamp: new Date(Date.now()).toISOString(),
+				duration: millisecondsSpent,
+			}, ...$resultHistory])
 		}
 		// numLettersTyped = Math.min(currentInput.length, startText.length)
 	}
@@ -89,22 +94,31 @@ import { element } from 'svelte/internal';
 		// oraclePopulate(sizes[size])
 		window.location.search=`size=${size}`
 	}
-	function resetGame(){
+	function resetGame(regen=true){
 		gameStatus = 'loading'
-		currentInput = "";
-		startText = "--";
 		numLettersTyped = 0;
 		numCorrectLetters = 0;
 		numWordsTyped = 0;
 		millisecondsSpent = 0;
 		startTime = 0;
-		oraclePopulate(sizes[sizeString])
+		if(regen){
+			currentInput = "";
+			startText = "--";
+			oraclePopulate(sizes[sizeString])
+		}
+		else{
+			currentInput=""
+			gameStatus='pre'
+		}
 	}
 	document.onkeydown = e=>{
 		// console.log(e)
 		if(e.key=='Tab'){
 			resetGame()
-		} 
+		}
+		if(e.key=='Escape'){
+			resetGame(false)
+		}
 	}
 	let graphMax = 0;
 	$: {
@@ -127,6 +141,13 @@ import { element } from 'svelte/internal';
 		downloaderElem.click();
 		// window.open(objectURL)
 		// debugger
+	}
+	function reviewSession(sessionIndex){
+		const session = $resultHistory[sessionIndex]
+		console.log('reviewing', session)
+		startText = ''
+		millisecondsSpent = session.millisecondsSpent
+		gameStatus = 'post'
 	}
 </script>
 
@@ -154,6 +175,10 @@ import { element } from 'svelte/internal';
 			<!-- <p class="testInput" contenteditable={gameStatus!='post'} on:input={(e)=>currentInput=e.target.innerText} autofocus></p> -->
 		{/if}
 	</div>
+	<p class="keyInstructions">
+		<code>tab</code> to regenerate
+		<code>esc</code> to retry
+	</p>
 	<h2>test size</h2>
 	<button style={sizeString=="small"?"background-color: lightskyblue;":null} on:click={_=>regenerate('small')}>small</button>
 	<button style={sizeString=="medium"?"background-color: lightskyblue;":null} on:click={_=>regenerate('medium')}>medium</button>
@@ -164,11 +189,12 @@ import { element } from 'svelte/internal';
 	<button on:click={downloadPastAttempts}>download json</button>
 	<a bind:this={downloaderElem} style="display: none;"></a>
 	<ul>
-		{#each $resultHistory as result}
+		{#each $resultHistory as result, i}
 			<li class="attemptListItem">
 				{result.wpm} wpm 
 				{result.cpm} cpm 
 				{result.acc}% acc
+				<!-- <button style="padding: 2px; font-size: 14px;" on:click={_=>reviewSession(i)}>view</button> -->
 				<div class="graphBar" style="width: {(result.cpm*result.acc)/graphMax}%;"></div>
 			</li>
 		{/each}
@@ -176,6 +202,13 @@ import { element } from 'svelte/internal';
 </main>
 
 <style lang="scss">
+	.keyInstructions{
+		code{
+			background-color: #ddd;
+			padding: 4px;
+			border-radius: 4px;
+		}
+	}
 	.graphBar{
 		// position: absolute;
 		height: 0.8ch;

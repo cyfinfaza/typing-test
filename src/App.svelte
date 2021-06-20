@@ -179,7 +179,7 @@
 		<code>esc</code> to retry current sample
 	</p>
 	<div class="optionsContainer">
-		<h2>test size</h2>
+		<h2>test length</h2>
 		<button style={sizeString=="small"?"background-color: lightskyblue;":null} on:click={_=>regenerate('small')}>small</button>
 		<button style={sizeString=="medium"?"background-color: lightskyblue;":null} on:click={_=>regenerate('medium')}>medium</button>
 		<button style={sizeString=="large"?"background-color: lightskyblue;":null} on:click={_=>regenerate('large')}>large</button>

@@ -1,13 +1,11 @@
-# CyLicense 1:1 - Mine, not yours.
+# CyLicense 1:2 - Mine, for you.
 
 ## Without permission from the authors, you may not:
-- Redistribute or host modified versions of this software without visibly crediting the original authors
-- Redistribute or host closed-source versions of this software
-- Host this software for commercial use
+- Redistribute, host, or include this software in other software without crediting the original author(s) in the source code (for open-source projects only) or a credits section (for open or closed-source projects)
 
 ## You are free to:
-- Host this software for non-commercial use
-- Create open-source forks of this software, retaining this license, and visibly crediting the original authors
+- Use this software for commercial and non-commercial purposes
+- Redistribute or host closed-source versions of this software
 - Contribute to this software, and credit contributions to yourself
 
 Remember, you are always free to ask for permission from the authors to do anything you would like with this software.  

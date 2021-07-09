@@ -194,7 +194,7 @@
 	<div class="optionsContainer">
 		<h2>about</h2>
 		<p>made by <a href="https://cy2.me">cy westbrook</a></p>
-		<p>soure code on <a href="https://github.com/cyfinfaza/typing-test">github</a></p>
+		<p>source code on <a href="https://github.com/cyfinfaza/typing-test">github</a></p>
 	</div>
 	<h2>past attempts </h2> 
 	<AreYouSureButton onclick={_=>resultHistory.set([])}>clear past attempts</AreYouSureButton>
